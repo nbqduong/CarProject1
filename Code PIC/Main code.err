@@ -1,7 +1,0 @@
-Compiling D:\Car project\Code PIC\Main code on 27-Jun-22 at 16:36
->>> Warning 203 "D:\Car project\Code PIC\Main code.c" Line 99(1,1): Condition always TRUE
->>> Warning 203 "D:\Car project\Code PIC\Main code.c" Line 103(1,1): Condition always TRUE
->>> Warning 207 "D:\Car project\Code PIC\Main code.c" Line 121(1,1): Code has no effect
-      Memory usage:   ROM=8%      RAM=7% - 11%
-      0 Errors,  3 Warnings.
-Build Successful.
