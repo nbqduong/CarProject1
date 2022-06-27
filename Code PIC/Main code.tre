@@ -1,0 +1,107 @@
+ÀÄMain code
+   ÃÄMAIN  0/63  Ram=1
+   ³  ÃÄ@cinit1  (Inline)  Ram=0
+   ³  ÃÄ@cinit2  (Inline)  Ram=0
+   ³  ÃÄsetup  0/126  Ram=0
+   ³  ³  ÃÄ@delay_ms1  0/20  Ram=1
+   ³  ³  ÃÄMAX7219_INIT  (Inline)  Ram=0
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÃÄ@delay_ms1  0/20  Ram=1
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÀÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³  ÃÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ³  ÀÄSPI_Write_Byte  0/51  Ram=7
+   ³  ³  ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³  ÀÄ*
+   ³  ³  ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³  ÀÄ*
+   ³  ³  ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³  ÀÄ*
+   ³  ³  ÀÄsend_data  0/15  Ram=2
+   ³  ³     ÀÄ*
+   ³  ÃÄsetup0  0/24  Ram=0
+   ³  ÃÄsend_data  0/15  Ram=2
+   ³  ³  ÀÄ*
+   ³  ÃÄmove  0/25  Ram=2
+   ³  ³  ÃÄcheck_status  0/46  Ram=1
+   ³  ³  ³  ÀÄ@delay_ms1  0/20  Ram=1
+   ³  ³  ÃÄgo_for  (Inline)  Ram=1
+   ³  ³  ³  ÀÄfunny  0/74  Ram=1
+   ³  ³  ³     ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³     ³  ÀÄ*
+   ³  ³  ³     ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³     ³  ÀÄ*
+   ³  ³  ³     ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³     ³  ÀÄ*
+   ³  ³  ³     ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³     ³  ÀÄ*
+   ³  ³  ³     ÃÄ@goto7649  0/10  Ram=0
+   ³  ³  ³     ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³     ³  ÀÄ*
+   ³  ³  ³     ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³     ³  ÀÄ*
+   ³  ³  ³     ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³     ³  ÀÄ*
+   ³  ³  ³     ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³     ³  ÀÄ*
+   ³  ³  ³     ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³     ³  ÀÄ*
+   ³  ³  ³     ÃÄsend_data  0/15  Ram=2
+   ³  ³  ³     ³  ÀÄ*
+   ³  ³  ³     ÀÄcheck_status  0/46  Ram=1
+   ³  ³  ³        ÀÄ*
+   ³  ³  ÃÄcheck_status  0/46  Ram=1
+   ³  ³  ³  ÀÄ*
+   ³  ³  ÀÄstop  0/180  Ram=0
+   ³  ³     ÀÄnormal_  (Inline)  Ram=6
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄcheck_status  0/46  Ram=1
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄcheck_status  0/46  Ram=1
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÃÄsend_data  0/15  Ram=2
+   ³  ³        ³  ÀÄ*
+   ³  ³        ÀÄcheck_status  0/46  Ram=1
+   ³  ³           ÀÄ*
+   ³  ÀÄstop  0/180  Ram=0
+   ³     ÀÄ*
+   ÀÄplus_flag  0/7  Ram=0

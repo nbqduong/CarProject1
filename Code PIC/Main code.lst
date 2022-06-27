@@ -1,18 +1,18 @@
-CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
+CCS PCM C Compiler, Version 5.101, 43599               27-Jun-22 16:36
 
-               Filename:   D:\PIC\Projects\project 1\SPI_Hardware.lst
+               Filename:   D:\Car project\Code PIC\Main code.lst
 
-               ROM used:   533 words (7%)
+               ROM used:   688 words (8%)
                            Largest free fragment is 2048
-               RAM used:   24 (7%) at main() level
-                           37 (10%) worst case
-               Stack used: 3 locations (2 in main + 1 for interrupts)
+               RAM used:   26 (7%) at main() level
+                           42 (11%) worst case
+               Stack used: 4 locations (3 in main + 1 for interrupts)
                Stack size: 8
 
 *
-0000:  MOVLW  01
+0000:  MOVLW  02
 0001:  MOVWF  0A
-0002:  GOTO   1DC
+0002:  GOTO   271
 0003:  NOP
 0004:  MOVWF  7F
 0005:  SWAPF  03,W
@@ -57,7 +57,7 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 002C:  BCF    0A.3
 002D:  BCF    0A.4
 002E:  GOTO   02F
-.................... #include <16F887.h>
+....................    #include <16F887.h>
 .................... //////////// Standard Header file for the PIC16F887 device ////////////////
 .................... ///////////////////////////////////////////////////////////////////////////
 .................... ////        (C) Copyright 1996, 2020 Custom Computer Services          ////
@@ -69,13 +69,24 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 .................... //// form are not restricted in any way.                               ////
 .................... ///////////////////////////////////////////////////////////////////////////
 .................... #device PIC16F887
+*
+019A:  BSF    0A.0
+019B:  BCF    0A.1
+019C:  BCF    0A.2
+019D:  ADDWF  02,F
+019E:  GOTO   171
+019F:  GOTO   177
+01A0:  GOTO   17D
+01A1:  GOTO   183
+01A2:  GOTO   189
+01A3:  GOTO   18F
 .................... 
 .................... #list
 .................... 
 .................... #FUSES NOWDT, HS, NOPROTECT
 .................... #use delay(clock=20000000)
 *
-0036:  MOVLW  39
+0036:  MOVLW  3C
 0037:  MOVWF  04
 0038:  BCF    03.7
 0039:  MOVF   00,W
@@ -100,9 +111,9 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 .................... #byte PORTA=0x05
 .................... #byte motor_port=0x06
 .................... #byte portd=0x08
-.................... #byte PORTC=0x07
+.................... #byte status_port=0x07
 .................... 
-....................  //Declare Pin's function
+....................  //define Pin's function
 ....................  
 ....................  //Matrix led
 .................... #define CS_Pin       pin_a1
@@ -115,6 +126,14 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 .................... #define SHUTDOWN     12
 .................... #define DISPLAY_TEST 16
 .................... 
+.................... #define for_sensor           input(pin_c4)
+.................... #define right_sensor        input(pin_c5)
+.................... #define left_sensor        input(pin_c6)
+.................... #define back_sensor        input(pin_c3)
+.................... 
+.................... #define have_obstace       0
+.................... #define not_obstace      1
+.................... 
 ....................       //GLOBAL VARIABLE PLACE
 .................... //Motor
 .................... 
@@ -125,6 +144,9 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 .................... 
 .................... int flag =0, trig=0;
 .................... 
+.................... const int all_clean =0, for_obstace = 1, left_obstace =2, right_obstace=3, back_obstace=4;
+.................... 
+.................... int run_time = 0, now=0;
 .................... 
 ....................          //FUNCTION PLACE
 .................... //connect with ledmatrix
@@ -139,32 +161,16 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 .................... void funny();
 .................... 
 .................... //Move car
-.................... void go_for( int times);
-.................... void go_back(int times);
-.................... void turn_left(int times);
-.................... void turn_right(int times);
-.................... void stop(int times);
+.................... void move(run_time);
+.................... void not_move(int free_time);
+.................... void go_for();
+.................... void go_back();
+.................... void turn_left();
+.................... void turn_right();
+.................... void stop();
 .................... 
-.................... //Check status
-.................... void check_status(int check_times)
-.................... {
-....................    for (int i=0; i < check_times; i++) 
-*
-0123:  CLRF   38
-0124:  MOVF   37,W
-0125:  SUBWF  38,W
-0126:  BTFSC  03.0
-0127:  GOTO   12D
-....................    {
-....................       delay_ms(10);
-0128:  MOVLW  0A
-0129:  MOVWF  39
-012A:  CALL   036
-012B:  INCF   38,F
-012C:  GOTO   124
-....................    }
-012D:  RETURN
-.................... }
+.................... // status
+.................... int check_status();
 .................... 
 .................... //setup
 .................... void setup();
@@ -179,7 +185,7 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 010D:  MOVLW  FF
 010E:  MOVWF  07
 010F:  BCF    03.5
-0110:  MOVWF  31
+0110:  MOVWF  33
 ....................    SET_TRIS_B(0);
 0111:  MOVLW  00
 0112:  BSF    03.5
@@ -191,20 +197,18 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 ....................    portd=~(1<<7);
 0117:  MOVLW  7F
 0118:  MOVWF  08
-....................    portc=0;
-0119:  CLRF   07
 ....................    enable_interrupts(GLOBAL);
-011A:  MOVLW  C0
-011B:  IORWF  0B,F
+0119:  MOVLW  C0
+011A:  IORWF  0B,F
 ....................    enable_interrupts(INT_EXT);
-011C:  BSF    0B.4
+011B:  BSF    0B.4
 ....................    ext_int_edge(H_to_L);
-011D:  BSF    03.5
-011E:  BCF    01.6
-011F:  BCF    03.5
-0120:  BCF    0A.3
-0121:  BCF    0A.4
-0122:  GOTO   206 (RETURN)
+011C:  BSF    03.5
+011D:  BCF    01.6
+011E:  BCF    03.5
+011F:  BCF    0A.3
+0120:  BCF    0A.4
+0121:  GOTO   29D (RETURN)
 .................... }
 .................... 
 .................... #INT_EXT
@@ -222,328 +226,447 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 0035:  GOTO   01B
 ....................    }
 ....................    
-....................    
+....................                //   ******MAIN FUNCTION******
 .................... void main()
 *
-01DC:  MOVF   03,W
-01DD:  ANDLW  1F
-01DE:  MOVWF  03
-01DF:  MOVLW  80
-01E0:  MOVWF  27
-01E1:  MOVLW  20
-01E2:  MOVWF  28
-01E3:  MOVLW  08
-01E4:  MOVWF  29
-01E5:  MOVLW  02
-01E6:  MOVWF  2A
-01E7:  MOVLW  40
-01E8:  MOVWF  2B
-01E9:  MOVLW  10
-01EA:  MOVWF  2C
-01EB:  MOVLW  04
-01EC:  MOVWF  2D
-01ED:  MOVLW  01
-01EE:  MOVWF  2E
-01EF:  CLRF   2F
-01F0:  CLRF   30
-01F1:  MOVLW  FF
-01F2:  MOVWF  31
-01F3:  BSF    03.5
-01F4:  BSF    03.6
-01F5:  MOVF   09,W
-01F6:  ANDLW  C0
-01F7:  MOVWF  09
-01F8:  BCF    03.6
-01F9:  BCF    1F.4
-01FA:  BCF    1F.5
-01FB:  MOVLW  00
-01FC:  BSF    03.6
-01FD:  MOVWF  08
-01FE:  BCF    03.5
-01FF:  CLRF   07
-0200:  CLRF   08
-0201:  CLRF   09
-0202:  BCF    03.7
+0271:  MOVF   03,W
+0272:  ANDLW  1F
+0273:  MOVWF  03
+0274:  MOVLW  80
+0275:  MOVWF  27
+0276:  MOVLW  20
+0277:  MOVWF  28
+0278:  MOVLW  08
+0279:  MOVWF  29
+027A:  MOVLW  02
+027B:  MOVWF  2A
+027C:  MOVLW  40
+027D:  MOVWF  2B
+027E:  MOVLW  10
+027F:  MOVWF  2C
+0280:  MOVLW  04
+0281:  MOVWF  2D
+0282:  MOVLW  01
+0283:  MOVWF  2E
+0284:  CLRF   2F
+0285:  CLRF   30
+0286:  CLRF   31
+0287:  CLRF   32
+0288:  MOVLW  FF
+0289:  MOVWF  33
+028A:  BSF    03.5
+028B:  BSF    03.6
+028C:  MOVF   09,W
+028D:  ANDLW  C0
+028E:  MOVWF  09
+028F:  BCF    03.6
+0290:  BCF    1F.4
+0291:  BCF    1F.5
+0292:  MOVLW  00
+0293:  BSF    03.6
+0294:  MOVWF  08
+0295:  BCF    03.5
+0296:  CLRF   07
+0297:  CLRF   08
+0298:  CLRF   09
+0299:  BCF    03.7
 .................... {
 ....................  
 ....................    setup();
-0203:  BCF    03.6
-0204:  GOTO   08C
+029A:  BCF    03.6
+029B:  GOTO   08C
 ....................    setup0(); 
-0205:  GOTO   10A
+029C:  GOTO   10A
 ....................    for (int i=1; i<9; i++) send_data(i,0b00000000);
-0206:  MOVLW  01
-0207:  MOVWF  32
-0208:  MOVF   32,W
-0209:  SUBLW  08
-020A:  BTFSS  03.0
-020B:  GOTO   212
-020C:  MOVF   32,W
-020D:  MOVWF  37
-020E:  CLRF   38
-020F:  CALL   07D
-0210:  INCF   32,F
-0211:  GOTO   208
+029D:  MOVLW  01
+029E:  MOVWF  34
+029F:  MOVF   34,W
+02A0:  SUBLW  08
+02A1:  BTFSS  03.0
+02A2:  GOTO   2A9
+02A3:  MOVF   34,W
+02A4:  MOVWF  3C
+02A5:  CLRF   3D
+02A6:  CALL   07D
+02A7:  INCF   34,F
+02A8:  GOTO   29F
 ....................   
 ....................    while(1)
 ....................    { 
-....................       normal_();
-0212:  GOTO   12E
-0213:  GOTO   212
 ....................       
-....................      
+....................       move(50);
+02A9:  MOVLW  32
+02AA:  MOVWF  35
+02AB:  GOTO   258
+....................       while(1) stop();
+02AC:  CALL   1A4
+02AD:  GOTO   2AC
+02AE:  GOTO   2A9
 ....................       
 ....................    }
 .................... }
 ....................       //CHECK
-0214:  SLEEP
-.................... 
+02AF:  SLEEP
+.................... int check_status()
+.................... {
+....................     delay_ms(10);
+*
+0122:  MOVLW  0A
+0123:  MOVWF  3C
+0124:  CALL   036
+....................    if (for_sensor == have_obstace) return for_obstace;
+0125:  BSF    33.4
+0126:  MOVF   33,W
+0127:  BSF    03.5
+0128:  MOVWF  07
+0129:  BCF    03.5
+012A:  BTFSC  07.4
+012B:  GOTO   12F
+012C:  MOVLW  01
+012D:  MOVWF  78
+012E:  GOTO   14F
+....................    if (back_sensor == have_obstace) return back_obstace;
+012F:  BSF    33.3
+0130:  MOVF   33,W
+0131:  BSF    03.5
+0132:  MOVWF  07
+0133:  BCF    03.5
+0134:  BTFSC  07.3
+0135:  GOTO   139
+0136:  MOVLW  04
+0137:  MOVWF  78
+0138:  GOTO   14F
+....................    if (right_sensor == have_obstace) return right_obstace;
+0139:  BSF    33.5
+013A:  MOVF   33,W
+013B:  BSF    03.5
+013C:  MOVWF  07
+013D:  BCF    03.5
+013E:  BTFSC  07.5
+013F:  GOTO   143
+0140:  MOVLW  03
+0141:  MOVWF  78
+0142:  GOTO   14F
+....................    if (left_sensor == have_obstace) return left_obstace;
+0143:  BSF    33.6
+0144:  MOVF   33,W
+0145:  BSF    03.5
+0146:  MOVWF  07
+0147:  BCF    03.5
+0148:  BTFSC  07.6
+0149:  GOTO   14D
+014A:  MOVLW  02
+014B:  MOVWF  78
+014C:  GOTO   14F
+....................    return all_clean;
+014D:  MOVLW  00
+014E:  MOVWF  78
+014F:  RETURN
+.................... }
 .................... 
 ....................       //MOTOR MOVE
-.................... void go_for(int times)
+.................... void move(run_time)
 .................... {
-....................    motor_port=(m1_f|m2_f|m3_f|m4_f);   check_status(times);
+....................    for(now ; now < run_time ; now++)
+*
+0258:  MOVF   35,W
+0259:  SUBWF  32,W
+025A:  BTFSC  03.0
+025B:  GOTO   26E
+....................    {
+....................       if (check_status() == all_clean) 
+025C:  CALL   122
+025D:  MOVF   78,F
+025E:  BTFSS  03.2
+025F:  GOTO   266
+....................       {
+....................          go_for();
+....................       }
+....................       if (check_status() != all_clean) 
+*
+0266:  CALL   122
+0267:  MOVF   78,F
+0268:  BTFSC  03.2
+0269:  GOTO   26C
+....................       {
+....................          stop();
+026A:  CALL   1A4
+....................          now--;
+026B:  DECF   32,F
+....................       }
+026C:  INCF   32,F
+026D:  GOTO   258
+....................       
+....................    }   
+026E:  BCF    0A.3
+026F:  BCF    0A.4
+0270:  GOTO   2AC (RETURN)
+.................... }     
+.................... 
+.................... void not_move(int free_time)   
+.................... {
+....................    int m=0; stop();
+....................    for (int i =0; i<free_time; i++) m=check_status();
+.................... }
+....................   
+.................... void go_for()
+.................... {
+....................    motor_port=(m1_f|m2_f|m3_f|m4_f);      funny();
+*
+0260:  MOVF   27,W
+0261:  IORWF  28,W
+0262:  IORWF  29,W
+0263:  IORWF  2A,W
+0264:  MOVWF  06
+0265:  GOTO   150
 .................... }
 .................... 
-.................... void go_back(int times)
+.................... void go_back()
 .................... {
-....................    motor_port = (m1_b|m2_b|m3_b|m4_b);   check_status(times);
+....................    motor_port = (m1_b|m2_b|m3_b|m4_b); funny();  
 .................... }
 .................... 
-.................... void turn_left(int times)
+.................... void turn_left()
 .................... {
-....................    motor_port = (m1_f|m3_f);   check_status(times);
+....................    motor_port = (m1_f|m3_f);   funny();
 .................... }
 .................... 
-.................... void turn_right(int times)
+.................... void turn_right()
 .................... {
-....................    motor_port = (m2_f|m4_f);      check_status(times);
+....................    motor_port = (m2_f|m4_f);      funny();
 .................... }
 .................... 
-.................... void stop(int times)
+.................... void stop()
 .................... {
-....................    motor_port =0;    check_status(times);
+....................    motor_port =0;    normal_();
+*
+01A4:  CLRF   06
+*
+0257:  RETURN
 .................... }
 .................... 
 .................... void normal_() 
 .................... {     
 ....................       send_data(1,0b11111111); //ve hang 1
 *
-012E:  MOVLW  01
-012F:  MOVWF  37
-0130:  MOVLW  FF
-0131:  MOVWF  38
-0132:  CALL   07D
+01A5:  MOVLW  01
+01A6:  MOVWF  3C
+01A7:  MOVLW  FF
+01A8:  MOVWF  3D
+01A9:  CALL   07D
 ....................       send_data(8,0b11111111); // hang 8
-0133:  MOVLW  08
-0134:  MOVWF  37
-0135:  MOVLW  FF
-0136:  MOVWF  38
-0137:  CALL   07D
+01AA:  MOVLW  08
+01AB:  MOVWF  3C
+01AC:  MOVLW  FF
+01AD:  MOVWF  3D
+01AE:  CALL   07D
 ....................       
 ....................       for (int i=2; i<8; i++) 
-0138:  MOVLW  02
-0139:  MOVWF  33
-013A:  MOVF   33,W
-013B:  SUBLW  07
-013C:  BTFSS  03.0
-013D:  GOTO   162
+01AF:  MOVLW  02
+01B0:  MOVWF  36
+01B1:  MOVF   36,W
+01B2:  SUBLW  07
+01B3:  BTFSS  03.0
+01B4:  GOTO   1D9
 ....................       {  
 ....................          switch (i)
-013E:  MOVF   33,W
-013F:  XORLW  03
-0140:  BTFSC  03.2
-0141:  GOTO   149
-0142:  XORLW  07
-0143:  BTFSC  03.2
-0144:  GOTO   14F
-0145:  XORLW  02
-0146:  BTFSC  03.2
-0147:  GOTO   155
-0148:  GOTO   15B
+01B5:  MOVF   36,W
+01B6:  XORLW  03
+01B7:  BTFSC  03.2
+01B8:  GOTO   1C0
+01B9:  XORLW  07
+01BA:  BTFSC  03.2
+01BB:  GOTO   1C6
+01BC:  XORLW  02
+01BD:  BTFSC  03.2
+01BE:  GOTO   1CC
+01BF:  GOTO   1D2
 ....................          {
 ....................             case 3: send_data(i, (0b10000101 ) ); break;
-0149:  MOVF   33,W
-014A:  MOVWF  37
-014B:  MOVLW  85
-014C:  MOVWF  38
-014D:  CALL   07D
-014E:  GOTO   160
+01C0:  MOVF   36,W
+01C1:  MOVWF  3C
+01C2:  MOVLW  85
+01C3:  MOVWF  3D
+01C4:  CALL   07D
+01C5:  GOTO   1D7
 ....................             case 4: send_data(i, (0b10100001 ) ); break;
-014F:  MOVF   33,W
-0150:  MOVWF  37
-0151:  MOVLW  A1
-0152:  MOVWF  38
-0153:  CALL   07D
-0154:  GOTO   160
+01C6:  MOVF   36,W
+01C7:  MOVWF  3C
+01C8:  MOVLW  A1
+01C9:  MOVWF  3D
+01CA:  CALL   07D
+01CB:  GOTO   1D7
 ....................             case 6: send_data(i, (0b10000101 ) ); break;
-0155:  MOVF   33,W
-0156:  MOVWF  37
-0157:  MOVLW  85
-0158:  MOVWF  38
-0159:  CALL   07D
-015A:  GOTO   160
+01CC:  MOVF   36,W
+01CD:  MOVWF  3C
+01CE:  MOVLW  85
+01CF:  MOVWF  3D
+01D0:  CALL   07D
+01D1:  GOTO   1D7
 ....................             default: send_data(i, (1 | 1<<7) ); break;           
-015B:  MOVF   33,W
-015C:  MOVWF  37
-015D:  MOVLW  81
-015E:  MOVWF  38
-015F:  CALL   07D
+01D2:  MOVF   36,W
+01D3:  MOVWF  3C
+01D4:  MOVLW  81
+01D5:  MOVWF  3D
+01D6:  CALL   07D
 ....................          }                            
-0160:  INCF   33,F
-0161:  GOTO   13A
+01D7:  INCF   36,F
+01D8:  GOTO   1B1
 ....................       }
-....................       check_status(10);
-0162:  MOVLW  0A
-0163:  MOVWF  37
-0164:  CALL   123
+....................       for (int i =0; i<10 ; i++) check_status();
+01D9:  CLRF   37
+01DA:  MOVF   37,W
+01DB:  SUBLW  09
+01DC:  BTFSS  03.0
+01DD:  GOTO   1E1
+01DE:  CALL   122
+01DF:  INCF   37,F
+01E0:  GOTO   1DA
 .................... 
-....................       for (int z=1; z<100; z++);
-0165:  MOVLW  01
-0166:  MOVWF  34
-0167:  MOVF   34,W
-0168:  SUBLW  63
-0169:  BTFSS  03.0
-016A:  GOTO   16D
-016B:  INCF   34,F
-016C:  GOTO   167
 ....................       for (int i=2; i<8; i++) 
-016D:  MOVLW  02
-016E:  MOVWF  35
-016F:  MOVF   35,W
-0170:  SUBLW  07
-0171:  BTFSS  03.0
-0172:  GOTO   1A0
+01E1:  MOVLW  02
+01E2:  MOVWF  38
+01E3:  MOVF   38,W
+01E4:  SUBLW  07
+01E5:  BTFSS  03.0
+01E6:  GOTO   214
 ....................       {  
 ....................          switch (i)
-0173:  MOVF   35,W
-0174:  XORLW  03
-0175:  BTFSC  03.2
-0176:  GOTO   181
-0177:  XORLW  07
-0178:  BTFSC  03.2
-0179:  GOTO   187
-017A:  XORLW  01
-017B:  BTFSC  03.2
-017C:  GOTO   18D
-017D:  XORLW  03
-017E:  BTFSC  03.2
-017F:  GOTO   193
-0180:  GOTO   199
+01E7:  MOVF   38,W
+01E8:  XORLW  03
+01E9:  BTFSC  03.2
+01EA:  GOTO   1F5
+01EB:  XORLW  07
+01EC:  BTFSC  03.2
+01ED:  GOTO   1FB
+01EE:  XORLW  01
+01EF:  BTFSC  03.2
+01F0:  GOTO   201
+01F1:  XORLW  03
+01F2:  BTFSC  03.2
+01F3:  GOTO   207
+01F4:  GOTO   20D
 ....................          {
 ....................             case 3: send_data(i, (0b10000101 ) ); break;
-0181:  MOVF   35,W
-0182:  MOVWF  37
-0183:  MOVLW  85
-0184:  MOVWF  38
-0185:  CALL   07D
-0186:  GOTO   19E
+01F5:  MOVF   38,W
+01F6:  MOVWF  3C
+01F7:  MOVLW  85
+01F8:  MOVWF  3D
+01F9:  CALL   07D
+01FA:  GOTO   212
 ....................             case 4: send_data(i, (0b10100001 ) ); break;
-0187:  MOVF   35,W
-0188:  MOVWF  37
-0189:  MOVLW  A1
-018A:  MOVWF  38
-018B:  CALL   07D
-018C:  GOTO   19E
+01FB:  MOVF   38,W
+01FC:  MOVWF  3C
+01FD:  MOVLW  A1
+01FE:  MOVWF  3D
+01FF:  CALL   07D
+0200:  GOTO   212
 ....................             case 5: send_data(i, (0b10100001 ) ); break;
-018D:  MOVF   35,W
-018E:  MOVWF  37
-018F:  MOVLW  A1
-0190:  MOVWF  38
-0191:  CALL   07D
-0192:  GOTO   19E
+0201:  MOVF   38,W
+0202:  MOVWF  3C
+0203:  MOVLW  A1
+0204:  MOVWF  3D
+0205:  CALL   07D
+0206:  GOTO   212
 ....................             case 6: send_data(i, (0b10000101 ) ); break;
-0193:  MOVF   35,W
-0194:  MOVWF  37
-0195:  MOVLW  85
-0196:  MOVWF  38
-0197:  CALL   07D
-0198:  GOTO   19E
+0207:  MOVF   38,W
+0208:  MOVWF  3C
+0209:  MOVLW  85
+020A:  MOVWF  3D
+020B:  CALL   07D
+020C:  GOTO   212
 ....................             default: send_data(i, (1 | 1<<7) ); break;           
-0199:  MOVF   35,W
-019A:  MOVWF  37
-019B:  MOVLW  81
-019C:  MOVWF  38
-019D:  CALL   07D
+020D:  MOVF   38,W
+020E:  MOVWF  3C
+020F:  MOVLW  81
+0210:  MOVWF  3D
+0211:  CALL   07D
 ....................          }                            
-019E:  INCF   35,F
-019F:  GOTO   16F
+0212:  INCF   38,F
+0213:  GOTO   1E3
 ....................       }
-....................       check_status(10);
-01A0:  MOVLW  0A
-01A1:  MOVWF  37
-01A2:  CALL   123
+....................       for (int i =0; i<10 ; i++) check_status();
+0214:  CLRF   39
+0215:  MOVF   39,W
+0216:  SUBLW  09
+0217:  BTFSS  03.0
+0218:  GOTO   21C
+0219:  CALL   122
+021A:  INCF   39,F
+021B:  GOTO   215
 .................... 
 ....................     
 ....................      for (int i=2; i<8; i++) 
-01A3:  MOVLW  02
-01A4:  MOVWF  36
-01A5:  MOVF   36,W
-01A6:  SUBLW  07
-01A7:  BTFSS  03.0
-01A8:  GOTO   1D6
+021C:  MOVLW  02
+021D:  MOVWF  3A
+021E:  MOVF   3A,W
+021F:  SUBLW  07
+0220:  BTFSS  03.0
+0221:  GOTO   24F
 ....................       {  
 ....................          switch (i)
-01A9:  MOVF   36,W
-01AA:  XORLW  03
-01AB:  BTFSC  03.2
-01AC:  GOTO   1B7
-01AD:  XORLW  07
-01AE:  BTFSC  03.2
-01AF:  GOTO   1BD
-01B0:  XORLW  01
-01B1:  BTFSC  03.2
-01B2:  GOTO   1C3
-01B3:  XORLW  03
-01B4:  BTFSC  03.2
-01B5:  GOTO   1C9
-01B6:  GOTO   1CF
+0222:  MOVF   3A,W
+0223:  XORLW  03
+0224:  BTFSC  03.2
+0225:  GOTO   230
+0226:  XORLW  07
+0227:  BTFSC  03.2
+0228:  GOTO   236
+0229:  XORLW  01
+022A:  BTFSC  03.2
+022B:  GOTO   23C
+022C:  XORLW  03
+022D:  BTFSC  03.2
+022E:  GOTO   242
+022F:  GOTO   248
 ....................          {
 ....................             case 3: send_data(i, (0b10100101 ) ); break;
-01B7:  MOVF   36,W
-01B8:  MOVWF  37
-01B9:  MOVLW  A5
-01BA:  MOVWF  38
-01BB:  CALL   07D
-01BC:  GOTO   1D4
+0230:  MOVF   3A,W
+0231:  MOVWF  3C
+0232:  MOVLW  A5
+0233:  MOVWF  3D
+0234:  CALL   07D
+0235:  GOTO   24D
 ....................             case 4: send_data(i, (0b10100001 ) ); break;
-01BD:  MOVF   36,W
-01BE:  MOVWF  37
-01BF:  MOVLW  A1
-01C0:  MOVWF  38
-01C1:  CALL   07D
-01C2:  GOTO   1D4
+0236:  MOVF   3A,W
+0237:  MOVWF  3C
+0238:  MOVLW  A1
+0239:  MOVWF  3D
+023A:  CALL   07D
+023B:  GOTO   24D
 ....................             case 5: send_data(i, (0b10100001 ) ); break;
-01C3:  MOVF   36,W
-01C4:  MOVWF  37
-01C5:  MOVLW  A1
-01C6:  MOVWF  38
-01C7:  CALL   07D
-01C8:  GOTO   1D4
+023C:  MOVF   3A,W
+023D:  MOVWF  3C
+023E:  MOVLW  A1
+023F:  MOVWF  3D
+0240:  CALL   07D
+0241:  GOTO   24D
 ....................             case 6: send_data(i, (0b10100101 ) ); break;
-01C9:  MOVF   36,W
-01CA:  MOVWF  37
-01CB:  MOVLW  A5
-01CC:  MOVWF  38
-01CD:  CALL   07D
-01CE:  GOTO   1D4
+0242:  MOVF   3A,W
+0243:  MOVWF  3C
+0244:  MOVLW  A5
+0245:  MOVWF  3D
+0246:  CALL   07D
+0247:  GOTO   24D
 ....................             default: send_data(i, (1 | 1<<7) ); break;           
-01CF:  MOVF   36,W
-01D0:  MOVWF  37
-01D1:  MOVLW  81
-01D2:  MOVWF  38
-01D3:  CALL   07D
+0248:  MOVF   3A,W
+0249:  MOVWF  3C
+024A:  MOVLW  81
+024B:  MOVWF  3D
+024C:  CALL   07D
 ....................          }                            
-01D4:  INCF   36,F
-01D5:  GOTO   1A5
+024D:  INCF   3A,F
+024E:  GOTO   21E
 ....................       }
-....................       check_status(10);
-01D6:  MOVLW  0A
-01D7:  MOVWF  37
-01D8:  CALL   123
-01D9:  BCF    0A.3
-01DA:  BCF    0A.4
-01DB:  GOTO   213 (RETURN)
+....................       for (int i =0; i<10 ; i++) check_status();
+024F:  CLRF   3B
+0250:  MOVF   3B,W
+0251:  SUBLW  09
+0252:  BTFSS  03.0
+0253:  GOTO   257
+0254:  CALL   122
+0255:  INCF   3B,F
+0256:  GOTO   250
 .................... 
 .................... }
 .................... 
@@ -561,7 +684,7 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 ....................             case 6: send_data(i, (0b10100101 ) ); break;
 ....................             default: send_data(i, (1 | 1<<7) ); break;           
 ....................          }      
-....................       delay_ms(50);
+....................       for (int i =0; i<5 ; i++) check_status();
 ....................       
 ....................       for (int i=2; i<7; i++) 
 ....................          switch (i)
@@ -573,7 +696,7 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 ....................             case 6: send_data(i, (0b10100101 ) ); break;
 ....................             default: send_data(i, (1 | 1<<7) ); break;           
 ....................          }      
-....................       delay_ms(150);
+....................       for (int i =0; i<10 ; i++) check_status();
 ....................       
 ....................       for (int i=2; i<7; i++) 
 ....................          switch (i)
@@ -585,7 +708,7 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 ....................             case 6: send_data(i, (0b10000101 ) ); break;
 ....................             default: send_data(i, (1 | 1<<7) ); break;           
 ....................          }      
-....................       delay_ms(100);
+....................       for (int i =0; i<10 ; i++) check_status();
 ....................       
 ....................       for (int i=3; i<7; i++) 
 ....................          switch (i)
@@ -596,25 +719,100 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 ....................             case 6: send_data(i, (0b10000101 ) ); break;
 ....................             default: send_data(i, (1 | 1<<7) ); break;           
 ....................          }      
-....................       delay_ms(100);
+....................       for (int i =0; i<10 ; i++) check_status();
 .................... }
 .................... 
 .................... void funny()
 .................... {
 ....................       send_data(1,0b00111100); send_data(8,0b00111100);
+*
+0150:  MOVLW  01
+0151:  MOVWF  3C
+0152:  MOVLW  3C
+0153:  MOVWF  3D
+0154:  CALL   07D
+0155:  MOVLW  08
+0156:  MOVWF  3C
+0157:  MOVLW  3C
+0158:  MOVWF  3D
+0159:  CALL   07D
 ....................       send_data(2,0b01000010);  send_data(7,0b01000010);
+015A:  MOVLW  02
+015B:  MOVWF  3C
+015C:  MOVLW  42
+015D:  MOVWF  3D
+015E:  CALL   07D
+015F:  MOVLW  07
+0160:  MOVWF  3C
+0161:  MOVLW  42
+0162:  MOVWF  3D
+0163:  CALL   07D
 ....................       
 ....................        for (int i=2; i<8; i++) 
+0164:  MOVLW  02
+0165:  MOVWF  36
+0166:  MOVF   36,W
+0167:  SUBLW  07
+0168:  BTFSS  03.0
+0169:  GOTO   196
 ....................          switch (i)
+016A:  MOVLW  02
+016B:  SUBWF  36,W
+016C:  ADDLW  FA
+016D:  BTFSC  03.0
+016E:  GOTO   194
+016F:  ADDLW  06
+0170:  GOTO   19A
 ....................          {
 ....................             case 2: send_data(i,  0b01010010);  break;
+0171:  MOVF   36,W
+0172:  MOVWF  3C
+0173:  MOVLW  52
+0174:  MOVWF  3D
+0175:  CALL   07D
+0176:  GOTO   194
 ....................             case 3: send_data(i, (0b10100101 ) ); break;
+0177:  MOVF   36,W
+0178:  MOVWF  3C
+0179:  MOVLW  A5
+017A:  MOVWF  3D
+017B:  CALL   07D
+017C:  GOTO   194
 ....................             case 4: send_data(i, (0b10100001 ) ); break;
+017D:  MOVF   36,W
+017E:  MOVWF  3C
+017F:  MOVLW  A1
+0180:  MOVWF  3D
+0181:  CALL   07D
+0182:  GOTO   194
 ....................             case 5: send_data(i, (0b10100001 ) ); break;
+0183:  MOVF   36,W
+0184:  MOVWF  3C
+0185:  MOVLW  A1
+0186:  MOVWF  3D
+0187:  CALL   07D
+0188:  GOTO   194
 ....................             case 6: send_data(i, (0b10100101 ) ); break;
+0189:  MOVF   36,W
+018A:  MOVWF  3C
+018B:  MOVLW  A5
+018C:  MOVWF  3D
+018D:  CALL   07D
+018E:  GOTO   194
 ....................             case 7: send_data(i,  0b01010010);  break;          
+018F:  MOVF   36,W
+0190:  MOVWF  3C
+0191:  MOVLW  52
+0192:  MOVWF  3D
+0193:  CALL   07D
+0194:  INCF   36,F
+0195:  GOTO   166
 ....................          }      
-....................       delay_ms(200);
+....................       check_status();
+0196:  CALL   122
+0197:  BCF    0A.3
+0198:  BCF    0A.4
+0199:  GOTO   266 (RETURN)
 .................... }      
 .................... 
 .................... void SPI_Write_Byte(unsigned char num) // gui 1 byte toi slave theo chuan SPI
@@ -627,29 +825,29 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 004C:  BCF    03.5
 004D:  BCF    05.0
 ....................     Mask = 128;
-004E:  CLRF   3D
+004E:  CLRF   42
 004F:  MOVLW  80
-0050:  MOVWF  3C
+0050:  MOVWF  41
 ....................     for (t=0; t<8; t++){
-0051:  CLRF   3B
-0052:  CLRF   3A
-0053:  MOVF   3B,F
+0051:  CLRF   40
+0052:  CLRF   3F
+0053:  MOVF   40,F
 0054:  BTFSS  03.2
 0055:  GOTO   07C
-0056:  MOVF   3A,W
+0056:  MOVF   3F,W
 0057:  SUBLW  07
 0058:  BTFSS  03.0
 0059:  GOTO   07C
 ....................         Flag = num & Mask;
-005A:  MOVF   39,W
-005B:  ANDWF  3C,W
-005C:  MOVWF  3E
-005D:  CLRF   3F
+005A:  MOVF   3E,W
+005B:  ANDWF  41,W
+005C:  MOVWF  43
+005D:  CLRF   44
 ....................         if(Flag == 0) output_low(MOSI_Pin);
-005E:  MOVF   3E,F
+005E:  MOVF   43,F
 005F:  BTFSS  03.2
 0060:  GOTO   069
-0061:  MOVF   3F,F
+0061:  MOVF   44,F
 0062:  BTFSS  03.2
 0063:  GOTO   069
 0064:  BSF    03.5
@@ -674,11 +872,11 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 0074:  BCF    05.0
 ....................         Mask = Mask >> 1;
 0075:  BCF    03.0
-0076:  RRF    3D,F
-0077:  RRF    3C,F
-0078:  INCF   3A,F
+0076:  RRF    42,F
+0077:  RRF    41,F
+0078:  INCF   3F,F
 0079:  BTFSC  03.2
-007A:  INCF   3B,F
+007A:  INCF   40,F
 007B:  GOTO   053
 ....................       }
 007C:  RETURN
@@ -692,12 +890,12 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 007F:  BCF    03.5
 0080:  BCF    05.1
 ....................    SPI_Write_Byte(address);
-0081:  MOVF   37,W
-0082:  MOVWF  39
+0081:  MOVF   3C,W
+0082:  MOVWF  3E
 0083:  CALL   04A
 ....................    SPI_Write_Byte(value);
-0084:  MOVF   38,W
-0085:  MOVWF  39
+0084:  MOVF   3D,W
+0085:  MOVWF  3E
 0086:  CALL   04A
 ....................    output_high(CS_Pin);       // ket thuc
 0087:  BSF    03.5
@@ -715,17 +913,17 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 008D:  BSF    03.5
 008E:  MOVWF  07
 008F:  BCF    03.5
-0090:  MOVWF  31
+0090:  MOVWF  33
 ....................    output_high(pin_c2); // Chon Max7219 lam slave
-0091:  BCF    31.2
-0092:  MOVF   31,W
+0091:  BCF    33.2
+0092:  MOVF   33,W
 0093:  BSF    03.5
 0094:  MOVWF  07
 0095:  BCF    03.5
 0096:  BSF    07.2
 ....................    delay_ms(100);
 0097:  MOVLW  64
-0098:  MOVWF  39
+0098:  MOVWF  3C
 0099:  CALL   036
 ....................    
 ....................    MAX7219_INIT(); //Khoi dong Max7219
@@ -734,35 +932,35 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 ....................    send_data(DISPLAY_TEST,0x01);
 *
 00F0:  MOVLW  10
-00F1:  MOVWF  37
+00F1:  MOVWF  3C
 00F2:  MOVLW  01
-00F3:  MOVWF  38
+00F3:  MOVWF  3D
 00F4:  CALL   07D
 ....................    send_data(DECODE_MODE,0x00);
 00F5:  MOVLW  09
-00F6:  MOVWF  37
-00F7:  CLRF   38
+00F6:  MOVWF  3C
+00F7:  CLRF   3D
 00F8:  CALL   07D
 ....................    send_data(INTENSITY,0x00);
 00F9:  MOVLW  0A
-00FA:  MOVWF  37
-00FB:  CLRF   38
+00FA:  MOVWF  3C
+00FB:  CLRF   3D
 00FC:  CALL   07D
 ....................    send_data(SCAN_LIMIT,0x0f);
 00FD:  MOVLW  0B
-00FE:  MOVWF  37
+00FE:  MOVWF  3C
 00FF:  MOVLW  0F
-0100:  MOVWF  38
+0100:  MOVWF  3D
 0101:  CALL   07D
 ....................    send_data(SHUTDOWN,0x01);
 0102:  MOVLW  0C
-0103:  MOVWF  37
+0103:  MOVWF  3C
 0104:  MOVLW  01
-0105:  MOVWF  38
+0105:  MOVWF  3D
 0106:  CALL   07D
 0107:  BCF    0A.3
 0108:  BCF    0A.4
-0109:  GOTO   205 (RETURN)
+0109:  GOTO   29C (RETURN)
 .................... }
 .................... 
 .................... void MAX7219_INIT() { //cai dat cau hinh cho MAX7219 
@@ -775,11 +973,11 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 009D:  BCF    05.1
 ....................   SPI_Write_Byte(0x0C);    // Select Shutdown register
 009E:  MOVLW  0C
-009F:  MOVWF  39
+009F:  MOVWF  3E
 00A0:  CALL   04A
 ....................   SPI_Write_Byte(0x01);    // Set D0 bit to return to normal operation
 00A1:  MOVLW  01
-00A2:  MOVWF  39
+00A2:  MOVWF  3E
 00A3:  CALL   04A
 ....................   output_high(CS_Pin);              // CS pin is pulled HIGH
 00A4:  BSF    03.5
@@ -795,11 +993,11 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 00AB:  BCF    05.1
 ....................   SPI_Write_Byte(0x09);    // Select Decode Mode register
 00AC:  MOVLW  09
-00AD:  MOVWF  39
+00AD:  MOVWF  3E
 00AE:  CALL   04A
 ....................   SPI_Write_Byte(0x0F);    // Select BCD mode for digits DIG0-DIG3
 00AF:  MOVLW  0F
-00B0:  MOVWF  39
+00B0:  MOVWF  3E
 00B1:  CALL   04A
 ....................   output_high(CS_Pin);              // CS pin is pulled HIGH
 00B2:  BSF    03.5
@@ -815,11 +1013,11 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 00B9:  BCF    05.1
 ....................   SPI_Write_Byte(0x0A);    // Select Intensity register
 00BA:  MOVLW  0A
-00BB:  MOVWF  39
+00BB:  MOVWF  3E
 00BC:  CALL   04A
 ....................   SPI_Write_Byte(0x0F);    // Set maximum brightness
 00BD:  MOVLW  0F
-00BE:  MOVWF  39
+00BE:  MOVWF  3E
 00BF:  CALL   04A
 ....................   output_high(CS_Pin);              // CS pin is pulled HIGH
 00C0:  BSF    03.5
@@ -835,11 +1033,11 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 00C7:  BCF    05.1
 ....................   SPI_Write_Byte(0x0B);    // Select Scan-Limit register
 00C8:  MOVLW  0B
-00C9:  MOVWF  39
+00C9:  MOVWF  3E
 00CA:  CALL   04A
 ....................   SPI_Write_Byte(0x03);    // Select digits DIG0-DIG3
 00CB:  MOVLW  03
-00CC:  MOVWF  39
+00CC:  MOVWF  3E
 00CD:  CALL   04A
 ....................   output_high(CS_Pin);              // CS pin is pulled HIGH
 00CE:  BSF    03.5
@@ -855,11 +1053,11 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 00D5:  BCF    05.1
 ....................   SPI_Write_Byte(0x0F);    // Select Display-Test register
 00D6:  MOVLW  0F
-00D7:  MOVWF  39
+00D7:  MOVWF  3E
 00D8:  CALL   04A
 ....................   SPI_Write_Byte(0x01);    // Enable Display-Test
 00D9:  MOVLW  01
-00DA:  MOVWF  39
+00DA:  MOVWF  3E
 00DB:  CALL   04A
 ....................   output_high(CS_Pin);              // CS pin is pulled HIGH
 00DC:  BSF    03.5
@@ -869,7 +1067,7 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 .................... 
 ....................   Delay_ms(100);
 00E0:  MOVLW  64
-00E1:  MOVWF  39
+00E1:  MOVWF  3C
 00E2:  CALL   036
 ....................  // Disable Display-Test
 ....................   output_low(CS_Pin);              // CS pin is pulled LOW
@@ -879,10 +1077,10 @@ CCS PCM C Compiler, Version 5.101, 43599               26-Jun-22 23:43
 00E6:  BCF    05.1
 ....................   SPI_Write_Byte(0x0F);    // Select Display-Test register
 00E7:  MOVLW  0F
-00E8:  MOVWF  39
+00E8:  MOVWF  3E
 00E9:  CALL   04A
 ....................   SPI_Write_Byte(0x00);    // Disable Display-Test
-00EA:  CLRF   39
+00EA:  CLRF   3E
 00EB:  CALL   04A
 ....................   output_high(CS_Pin); ;             // CS pin is pulled HIGH
 00EC:  BSF    03.5

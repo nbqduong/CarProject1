@@ -1,4 +1,4 @@
-#include <16F887.h>
+   #include <16F887.h>
 #FUSES NOWDT, HS, NOPROTECT
 #use delay(clock=20000000)
 
@@ -6,7 +6,7 @@
 #byte PORTA=0x05
 #byte motor_port=0x06
 #byte portd=0x08
-#byte PORTC=0x07
+#byte status_port=0x07
 
  //Declare Pin's function
  
@@ -51,7 +51,7 @@ void turn_left(int times);
 void turn_right(int times);
 void stop(int times);
 
-//Check status
+// status
 void check_status(int check_times)
 {
    for (int i=0; i < check_times; i++) 
@@ -59,6 +59,8 @@ void check_status(int check_times)
       delay_ms(10);
    }
 }
+
+int status();
 
 //setup
 void setup();
@@ -69,7 +71,6 @@ void setup0()
    SET_TRIS_B(0);
    output_high(POWER_Pin);
    portd=~(1<<7);
-   portc=0;
    enable_interrupts(GLOBAL);
    enable_interrupts(INT_EXT);
    ext_int_edge(H_to_L);
@@ -82,7 +83,7 @@ void setup0()
       trig++;
    }
    
-   
+               //   ******MAIN FUNCTION******
 void main()
 {
  
@@ -92,14 +93,18 @@ void main()
   
    while(1)
    { 
-      normal_();
       
+      if (input(pin_c0)==1) scare();
+     else normal_();
      
       
    }
 }
       //CHECK
-
+int status()
+{
+   
+}
 
       //MOTOR MOVE
 void go_for(int times)

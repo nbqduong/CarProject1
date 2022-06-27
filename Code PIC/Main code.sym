@@ -2,10 +2,10 @@
 004-005 @READ_PROGRAM_MEMORY8.P2
 005     PORTA
 006     motor_port
-007     PORTC
+007     status_port
 008     portd
-015     CCP_1
 015     CCP_1_LOW
+015     CCP_1
 016     CCP_1_HIGH
 01B     CCP_2
 01B     CCP_2_LOW
@@ -27,22 +27,28 @@
 02E     m4_b
 02F     flag
 030     trig
-031     @TRIS_C
-032     funny.i
-032     MAIN.i
-033     normal_.i
-034     normal_.z
-035     normal_.i
+031     run_time
+032     now
+033     @TRIS_C
+034     MAIN.i
+035     move.run_time
 036     normal_.i
-037     send_data.address
-037     check_status.check_times
-038     check_status.i
-038     send_data.value
-039     SPI_Write_Byte.num
-039     @delay_ms1.P1
-03A-03B SPI_Write_Byte.t
-03C-03D SPI_Write_Byte.Mask
-03E-03F SPI_Write_Byte.flag
+036     funny.i
+036     move.@SCRATCH1
+036     go_for.@SCRATCH1
+037     normal_.i
+038     normal_.i
+039     normal_.i
+03A     normal_.i
+03B     normal_.i
+03C     @delay_ms1.P1
+03C     send_data.address
+03C     check_status.@SCRATCH1
+03D     send_data.value
+03E     SPI_Write_Byte.num
+03F-040 SPI_Write_Byte.t
+041-042 SPI_Write_Byte.Mask
+043-044 SPI_Write_Byte.flag
 077     @SCRATCH
 078     @SCRATCH
 078     _RETURN_
@@ -52,8 +58,8 @@
 0FF     @INTERRUPT_AREA
 107.6   C1OUT
 108.6   C2OUT
-10D-10E @WRITE_PROGRAM_MEMORY8.P1
-10D-10E @READ_PROGRAM_MEMORY8.P2
+10D-10E @READ_PROGRAM_MEMORY8.P1
+10D-10E @WRITE_PROGRAM_MEMORY8.P2
 17F     @INTERRUPT_AREA
 1FF     @INTERRUPT_AREA
 27F     @INTERRUPT_AREA
@@ -125,25 +131,30 @@ ROM Allocation:
 00008C  setup
 00009A  MAX7219_INIT
 00010A  setup0
-000123  check_status
-00012E  normal_
-0001DC  @cinit1
-0001DC  MAIN
-000202  @cinit2
+000122  check_status
+000150  funny
+00019A  @goto7649
+0001A4  stop
+0001A5  normal_
+000258  move
+000260  go_for
+000271  MAIN
+000271  @cinit1
+000299  @cinit2
 
 Project Directory:
-    D:\PIC\Projects\project 1\
+    D:\Car project\Code PIC\
 
 Project Files:
-    SPI_Hardware.c                                          [26-Jun-22 23:43  CRC=EAE1B865]
+    Main code.c                                             [27-Jun-22 16:36  CRC=D19018C8]
     C:\Program Files (x86)\PICC\Devices\16F887.h            [21-Jan-21 11:32  CRC=461DBE83]
 
-Source signature=771D356B
+Source signature=5DCB95CE
 Program memory checksum=0000
-Hex file CRC=25DF
+Hex file CRC=7260
 
 Units:
-    D:\PIC\Projects\project 1\SPI_Hardware (main)
+    D:\Car project\Code PIC\Main code (main)
 
 Compiler Settings:
     Processor:      PIC16F887
@@ -155,13 +166,13 @@ Compiler Settings:
     Compile Mode:   CCS5
 
 Output Files:
-    XREF file:   SPI_Hardware.xsym
-    Errors:      SPI_Hardware.err
-    Ext Symbols: SPI_Hardware.esym
-    INHX8:       SPI_Hardware.hex
-    Symbols:     SPI_Hardware.sym
-    List:        SPI_Hardware.lst
-    Debug/COFF:  SPI_Hardware.cof
-    Project:     SPI_Hardware.ccspjt
-    Call Tree:   SPI_Hardware.tre
-    Statistics:  SPI_Hardware.STA
+    XREF file:   Main code.xsym
+    Errors:      Main code.err
+    Ext Symbols: Main code.esym
+    INHX8:       Main code.hex
+    Symbols:     Main code.sym
+    List:        Main code.lst
+    Debug/COFF:  Main code.cof
+    Project:     Main code.ccspjt
+    Call Tree:   Main code.tre
+    Statistics:  Main code.STA
