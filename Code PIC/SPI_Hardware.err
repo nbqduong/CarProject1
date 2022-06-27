@@ -1,0 +1,5 @@
+Compiling D:\PIC\Projects\project 1\SPI_Hardware on 26-Jun-22 at 23:43
+>>> Warning 203 "D:\PIC\Projects\project 1\SPI_Hardware.c" Line 93(1,1): Condition always TRUE
+      Memory usage:   ROM=7%      RAM=7% - 10%
+      0 Errors,  1 Warnings.
+Build Successful.

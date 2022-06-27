@@ -1,0 +1,167 @@
+004-005 @WRITE_PROGRAM_MEMORY8.P1
+004-005 @READ_PROGRAM_MEMORY8.P2
+005     PORTA
+006     motor_port
+007     PORTC
+008     portd
+015     CCP_1
+015     CCP_1_LOW
+016     CCP_1_HIGH
+01B     CCP_2
+01B     CCP_2_LOW
+01C     CCP_2_HIGH
+020     @INTERRUPT_AREA
+021     @INTERRUPT_AREA
+022     @INTERRUPT_AREA
+023     @INTERRUPT_AREA
+024     @INTERRUPT_AREA
+025     @INTERRUPT_AREA
+026     @INTERRUPT_AREA
+027     m1_f
+028     m2_f
+029     m3_f
+02A     m4_f
+02B     m1_b
+02C     m2_b
+02D     m3_b
+02E     m4_b
+02F     flag
+030     trig
+031     @TRIS_C
+032     funny.i
+032     MAIN.i
+033     normal_.i
+034     normal_.z
+035     normal_.i
+036     normal_.i
+037     send_data.address
+037     check_status.check_times
+038     check_status.i
+038     send_data.value
+039     SPI_Write_Byte.num
+039     @delay_ms1.P1
+03A-03B SPI_Write_Byte.t
+03C-03D SPI_Write_Byte.Mask
+03E-03F SPI_Write_Byte.flag
+077     @SCRATCH
+078     @SCRATCH
+078     _RETURN_
+079     @SCRATCH
+07A     @SCRATCH
+07F     @INTERRUPT_AREA
+0FF     @INTERRUPT_AREA
+107.6   C1OUT
+108.6   C2OUT
+10D-10E @WRITE_PROGRAM_MEMORY8.P1
+10D-10E @READ_PROGRAM_MEMORY8.P2
+17F     @INTERRUPT_AREA
+1FF     @INTERRUPT_AREA
+27F     @INTERRUPT_AREA
+2FF     @INTERRUPT_AREA
+37F     @INTERRUPT_AREA
+3FF     @INTERRUPT_AREA
+47F     @INTERRUPT_AREA
+4FF     @INTERRUPT_AREA
+57F     @INTERRUPT_AREA
+5FF     @INTERRUPT_AREA
+67F     @INTERRUPT_AREA
+6FF     @INTERRUPT_AREA
+77F     @INTERRUPT_AREA
+7FF     @INTERRUPT_AREA
+87F     @INTERRUPT_AREA
+8FF     @INTERRUPT_AREA
+97F     @INTERRUPT_AREA
+9FF     @INTERRUPT_AREA
+A7F     @INTERRUPT_AREA
+AFF     @INTERRUPT_AREA
+B7F     @INTERRUPT_AREA
+BFF     @INTERRUPT_AREA
+C7F     @INTERRUPT_AREA
+CFF     @INTERRUPT_AREA
+D7F     @INTERRUPT_AREA
+DFF     @INTERRUPT_AREA
+E7F     @INTERRUPT_AREA
+EFF     @INTERRUPT_AREA
+F7F     @INTERRUPT_AREA
+FFF     @INTERRUPT_AREA
+107F     @INTERRUPT_AREA
+10FF     @INTERRUPT_AREA
+117F     @INTERRUPT_AREA
+11FF     @INTERRUPT_AREA
+127F     @INTERRUPT_AREA
+12FF     @INTERRUPT_AREA
+137F     @INTERRUPT_AREA
+13FF     @INTERRUPT_AREA
+147F     @INTERRUPT_AREA
+14FF     @INTERRUPT_AREA
+157F     @INTERRUPT_AREA
+15FF     @INTERRUPT_AREA
+167F     @INTERRUPT_AREA
+16FF     @INTERRUPT_AREA
+177F     @INTERRUPT_AREA
+17FF     @INTERRUPT_AREA
+187F     @INTERRUPT_AREA
+18FF     @INTERRUPT_AREA
+197F     @INTERRUPT_AREA
+19FF     @INTERRUPT_AREA
+1A7F     @INTERRUPT_AREA
+1AFF     @INTERRUPT_AREA
+1B7F     @INTERRUPT_AREA
+1BFF     @INTERRUPT_AREA
+1C7F     @INTERRUPT_AREA
+1CFF     @INTERRUPT_AREA
+1D7F     @INTERRUPT_AREA
+1DFF     @INTERRUPT_AREA
+1E7F     @INTERRUPT_AREA
+1EFF     @INTERRUPT_AREA
+1F7F     @INTERRUPT_AREA
+1FFF     @INTERRUPT_AREA
+
+ROM Allocation:
+00002F  plus_flag
+000036  @delay_ms1
+00004A  SPI_Write_Byte
+00007D  send_data
+00008C  setup
+00009A  MAX7219_INIT
+00010A  setup0
+000123  check_status
+00012E  normal_
+0001DC  @cinit1
+0001DC  MAIN
+000202  @cinit2
+
+Project Directory:
+    D:\PIC\Projects\project 1\
+
+Project Files:
+    SPI_Hardware.c                                          [26-Jun-22 23:43  CRC=EAE1B865]
+    C:\Program Files (x86)\PICC\Devices\16F887.h            [21-Jan-21 11:32  CRC=461DBE83]
+
+Source signature=771D356B
+Program memory checksum=0000
+Hex file CRC=25DF
+
+Units:
+    D:\PIC\Projects\project 1\SPI_Hardware (main)
+
+Compiler Settings:
+    Processor:      PIC16F887
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+    Compile Mode:   CCS5
+
+Output Files:
+    XREF file:   SPI_Hardware.xsym
+    Errors:      SPI_Hardware.err
+    Ext Symbols: SPI_Hardware.esym
+    INHX8:       SPI_Hardware.hex
+    Symbols:     SPI_Hardware.sym
+    List:        SPI_Hardware.lst
+    Debug/COFF:  SPI_Hardware.cof
+    Project:     SPI_Hardware.ccspjt
+    Call Tree:   SPI_Hardware.tre
+    Statistics:  SPI_Hardware.STA
